@@ -150,9 +150,8 @@ func (g *GitlabRegistry) failOnError(err error, msg string) {
 		log.Fatalf("%s: %s", msg, err)
 	}
 }
-func (g *GitlabRegistry) msgAndExit(msg string, exitCode int) {
+func (g *GitlabRegistry) msgAndExit(msg string) {
 	log.Fatalf("Error: %s", msg)
-	os.Exit(exitCode)
 }
 func (g *GitlabRegistry) parseInput() {
 	domain := flag.String("domain", os.Getenv("CI_API_V4_URL"), "a base url of your gitlab with api version, ex: https://gitlab.example.com/api/v4")
@@ -166,16 +165,16 @@ func (g *GitlabRegistry) parseInput() {
 	flag.Parse()
 
 	if *domain == "" {
-		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "domain", "CI_API_V4_URL"), 1)
+		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "domain", "CI_API_V4_URL"))
 	}
 	if *authToken == "" {
-		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "authToken", "CI_REGISTRY_PASSWORD"), 2)
+		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "authToken", "CI_REGISTRY_PASSWORD"))
 	}
 	if *nameSpace == "" {
-		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "nameSpace", "CI_PROJECT_NAMESPACE"), 3)
+		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "nameSpace", "CI_PROJECT_NAMESPACE"))
 	}
 	if *projectName == "" {
-		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "projectName", "CI_PROJECT_NAME"), 4)
+		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "projectName", "CI_PROJECT_NAME"))
 	}
 
 	if *regex != "" && *specificTag != "" {
