@@ -1,1 +1,21 @@
 # gitlabRegistryController
+
+## Usage of ./gitlabRegistryController:
+- `-domain string`
+    - a base url of your gitlab, ex: https://gitlab.example.com
+    - If not set, take `CI_SERVER_URL` env automatically.
+- `-authToken string`
+    - a token that is used to auth with gitlab
+    - If not set, take `CI_REGISTRY_PASSWORD` env automatically.
+- `-nameSpace string`
+    - a namespace of your project
+    - If not set, take `CI_PROJECT_NAMESPACE` env automatically.
+- `-projectName string`
+    - a project name of your project
+    - If not set, take `CI_PROJECT_NAME` env automatically.
+- `-specificTag string`
+    - a image tag that you want to delete
+- `-regex string`
+    - a regex pattern to match all images
+- `-hold int`
+    - a volume of images that you want to keep from latest to older (default 3)
