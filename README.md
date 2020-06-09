@@ -1,4 +1,5 @@
 # gitlabRegistryController
+This tool is used to delete images in gitlab registry
 ## Get help
 `./gitlabRegistryController -h`
 ## Usage of ./gitlabRegistryController:
