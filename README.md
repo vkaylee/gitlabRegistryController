@@ -7,7 +7,7 @@
     - If not set, take `CI_API_V4_URL` env automatically.
 - `-authToken string`
     - a token that is used to auth with gitlab
-    - If not set, take `CI_REGISTRY_PASSWORD` env automatically.
+    - If not set, take `AUTH_TOKEN` env automatically.
 - `-nameSpace string`
     - a namespace of your project
     - If not set, take `CI_PROJECT_NAMESPACE` env automatically.
