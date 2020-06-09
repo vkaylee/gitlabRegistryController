@@ -2,8 +2,8 @@
 
 ## Usage of ./gitlabRegistryController:
 - `-domain string`
-    - a base url of your gitlab, ex: https://gitlab.example.com
-    - If not set, take `CI_SERVER_URL` env automatically.
+    - a base url of your gitlab with api version, ex: https://gitlab.example.com/api/v4
+    - If not set, take `CI_API_V4_URL` env automatically.
 - `-authToken string`
     - a token that is used to auth with gitlab
     - If not set, take `CI_REGISTRY_PASSWORD` env automatically.

@@ -80,7 +80,7 @@ func (g *GitlabRegistry) Run() {
 	}
 }
 func (g *GitlabRegistry) generateBaseUrl() {
-	baseUrl := fmt.Sprintf("%s/api/v4/projects/%s/registry/repositories", *g.Domain, *g.ProjectId)
+	baseUrl := fmt.Sprintf("%s/projects/%s/registry/repositories", *g.Domain, *g.ProjectId)
 	g.BaseUrl = &baseUrl
 }
 func (g *GitlabRegistry) generateRepositoryTagUrl() {
@@ -155,7 +155,7 @@ func (g *GitlabRegistry) msgAndExit(msg string, exitCode int) {
 	os.Exit(exitCode)
 }
 func (g *GitlabRegistry) parseInput() {
-	domain := flag.String("domain", os.Getenv("CI_SERVER_URL"), "a base url of your gitlab, ex: https://gitlab.example.com")
+	domain := flag.String("domain", os.Getenv("CI_API_V4_URL"), "a base url of your gitlab with api version, ex: https://gitlab.example.com/api/v4")
 	authToken := flag.String("authToken", os.Getenv("CI_REGISTRY_PASSWORD"), "a token that is used to auth with gitlab")
 	nameSpace := flag.String("nameSpace", os.Getenv("CI_PROJECT_NAMESPACE"), "a namespace of your project")
 	projectName := flag.String("projectName", os.Getenv("CI_PROJECT_NAME"), "a project name of your project")
