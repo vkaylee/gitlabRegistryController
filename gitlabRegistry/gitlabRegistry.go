@@ -139,7 +139,7 @@ func (g *GitlabRegistry) getRepoId() {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	g.failOnError(err, "Error reading all")
-
+	fmt.Println(string(body))
 	msgs := make([]Message,0)
 	err = json.Unmarshal(body, &msgs)
 	g.failOnError(err, "Error encode json")
@@ -155,7 +155,7 @@ func (g *GitlabRegistry) msgAndExit(msg string) {
 }
 func (g *GitlabRegistry) parseInput() {
 	domain := flag.String("domain", os.Getenv("CI_API_V4_URL"), "a base url of your gitlab with api version, ex: https://gitlab.example.com/api/v4")
-	authToken := flag.String("authToken", os.Getenv("CI_REGISTRY_PASSWORD"), "a token that is used to auth with gitlab")
+	authToken := flag.String("authToken", os.Getenv("AUTH_TOKEN"), "a token that is used to auth with gitlab")
 	nameSpace := flag.String("nameSpace", os.Getenv("CI_PROJECT_NAMESPACE"), "a namespace of your project")
 	projectName := flag.String("projectName", os.Getenv("CI_PROJECT_NAME"), "a project name of your project")
 	specificTag := flag.String("specificTag", "", "a image tag that you want to delete")
