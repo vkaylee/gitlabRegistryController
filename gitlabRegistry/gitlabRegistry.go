@@ -120,7 +120,7 @@ func (g *GitlabRegistry) deleteWithRegex() {
 	g.failOnError(err, "Error deleting url")
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusAccepted {
 		log.Printf("The request to delete with %s regex has just been done successfully", *g.Regex)
 	} else {
 		log.Printf("The request to delete with %s regex has not been done yet", *g.Regex)
