@@ -166,7 +166,7 @@ func (g *GitlabRegistry) parseInput() {
 	flag.Parse()
 
 	if *domain == "" {
-		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "domain", "CI_SERVER_URL"), 1)
+		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "domain", "CI_API_V4_URL"), 1)
 	}
 	if *authToken == "" {
 		g.msgAndExit(fmt.Sprintf("Please input with -%s or set %s", "authToken", "CI_REGISTRY_PASSWORD"), 2)
