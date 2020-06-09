@@ -1,5 +1,6 @@
 # gitlabRegistryController
-
+## Get help
+`./gitlabRegistryController -h`
 ## Usage of ./gitlabRegistryController:
 - `-domain string`
     - a base url of your gitlab with api version, ex: https://gitlab.example.com/api/v4
