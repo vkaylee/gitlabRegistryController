@@ -23,13 +23,7 @@ type GitlabRegistry struct {
 	SpecificTag *string
 	Regex *string
 	NumToHold *int
-}
-type Message struct {
-	ID int `json:"id"`
-}
-type DeleteWithRegex struct {
-	Regex    string `json:"name_regex"`
-	NumToHold int `json:"keep_n"`
+	HttpClient *http.Client
 }
 // setDomain sets the domain field's value.
 func (g *GitlabRegistry) setDomain(v *string) {
@@ -88,7 +82,6 @@ func (g *GitlabRegistry) generateRepositoryTagUrl() {
 	g.RepoTagUrl = &repoTagUrl
 }
 func (g *GitlabRegistry) deleteSpecificTag() {
-	client := &http.Client{}
 	req, err := http.NewRequest(
 		http.MethodDelete,
 		fmt.Sprintf("%s/%s", *g.RepoTagUrl, *g.SpecificTag),
@@ -96,7 +89,7 @@ func (g *GitlabRegistry) deleteSpecificTag() {
 		)
 	g.failOnError(err, "Error setting http request")
 	req.Header.Add("PRIVATE-TOKEN", *g.AuthToken)
-	resp, err := client.Do(req)
+	resp, err := g.HttpClient.Do(req)
 	g.failOnError(err, "Error deleting url")
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
@@ -106,17 +99,20 @@ func (g *GitlabRegistry) deleteSpecificTag() {
 	}
 }
 func (g *GitlabRegistry) deleteWithRegex() {
-	client := &http.Client{}
-	values := DeleteWithRegex{
+	type DeleteWithRegex struct {
+		Regex    string `json:"name_regex"`
+		NumToHold int `json:"keep_n"`
+	}
+	value := DeleteWithRegex{
 		Regex:     *g.Regex,
 		NumToHold: *g.NumToHold,
 	}
-	jsonValue, _ := json.Marshal(values)
+	jsonValue, _ := json.Marshal(value)
 	req, err := http.NewRequest(http.MethodDelete,*g.RepoTagUrl,bytes.NewBuffer(jsonValue))
 	g.failOnError(err, "Error setting http request")
 	req.Header.Add("PRIVATE-TOKEN", *g.AuthToken)
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := client.Do(req)
+	resp, err := g.HttpClient.Do(req)
 	g.failOnError(err, "Error deleting url")
 	defer resp.Body.Close()
 
@@ -130,11 +126,13 @@ func (g *GitlabRegistry) deleteWithRegex() {
 	}
 }
 func (g *GitlabRegistry) getRepoId() {
-	client := &http.Client{}
+	type Message struct {
+		ID int `json:"id"`
+	}
 	req, err := http.NewRequest(http.MethodGet, *g.BaseUrl, nil)
 	g.failOnError(err, "Error setting http request")
 	req.Header.Add("PRIVATE-TOKEN", *g.AuthToken)
-	resp, err := client.Do(req)
+	resp, err := g.HttpClient.Do(req)
 	g.failOnError(err, "Error getting BaseUrl")
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
