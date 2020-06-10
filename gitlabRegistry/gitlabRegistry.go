@@ -67,7 +67,7 @@ func (g *GitlabRegistry) prepare() {
 func (g *GitlabRegistry) Run() {
 	g.prepare()
 	if g.SpecificTag != nil {
-		g.deleteSpecificTag()
+		g.deleteSpecificTag(g.SpecificTag)
 	}
 	if g.Regex != nil {
 		g.deleteWithRegex()
@@ -81,10 +81,10 @@ func (g *GitlabRegistry) generateRepositoryTagUrl() {
 	repoTagUrl := fmt.Sprintf("%s/%d/tags", *g.BaseUrl, *g.RepoId)
 	g.RepoTagUrl = &repoTagUrl
 }
-func (g *GitlabRegistry) deleteSpecificTag() {
+func (g *GitlabRegistry) deleteSpecificTag(tag *string) {
 	req, err := http.NewRequest(
 		http.MethodDelete,
-		fmt.Sprintf("%s/%s", *g.RepoTagUrl, *g.SpecificTag),
+		fmt.Sprintf("%s/%s", *g.RepoTagUrl, *tag),
 		nil,
 		)
 	g.failOnError(err, "Error setting http request")
@@ -93,7 +93,7 @@ func (g *GitlabRegistry) deleteSpecificTag() {
 	g.failOnError(err, "Error deleting url")
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
-		log.Printf("%s has just been deleted successfully", *g.SpecificTag)
+		log.Printf("%s has just been deleted successfully", *tag)
 	} else {
 		log.Printf("%s was not deleted.", *g.SpecificTag)
 	}
