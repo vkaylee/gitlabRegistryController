@@ -160,22 +160,19 @@ func (g *GitlabRegistry) deleteWithRegex() {
 	}
 }
 func (g *GitlabRegistry) getRepoId() {
-	type Message struct {
+	type message struct {
 		ID int `json:"id"`
+		Path string `json:"path"`
+		ProjectId int `json:"project_id"`
+		Location string `json:"location"`
+		CreatedAt	string `json:"created_at"`
 	}
-	req, err := http.NewRequest(http.MethodGet, *g.BaseUrl, nil)
-	g.failOnError(err, "Error setting http request")
-	req.Header.Add("PRIVATE-TOKEN", *g.AuthToken)
-	resp, err := g.HttpClient.Do(req)
-	g.failOnError(err, "Error getting BaseUrl")
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	g.failOnError(err, "Error reading all")
-	fmt.Println(string(body))
-	msgs := make([]Message,0)
-	err = json.Unmarshal(body, &msgs)
-	g.failOnError(err, "Error encode json")
+	body := g.httpGet(g.BaseUrl)
+	msgs := make([]message,0)
+	err := json.Unmarshal(*body, &msgs)
+	g.failOnError(err, fmt.Sprintf("Error decode json: %s", string(*body)))
 	g.RepoId = &msgs[0].ID
+	fmt.Printf("ID : %d\nProjectID : %d\nPath : %s\nLocation : %s\nCreatedAt : %s\n", msgs[0].ID, msgs[0].ProjectId, msgs[0].Path, msgs[0].Location,msgs[0].CreatedAt)
 }
 func (g *GitlabRegistry) failOnError(err error, msg string) {
 	if err != nil {
