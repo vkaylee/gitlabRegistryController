@@ -64,6 +64,17 @@ func (g *GitlabRegistry) prepare() {
 	g.getRepoId()
 	g.generateRepositoryTagUrl()
 }
+func (g *GitlabRegistry) httpGet(url *string) *[]byte {
+	req, err := http.NewRequest(http.MethodGet, *url, nil)
+	g.failOnError(err, "Error setting http request")
+	req.Header.Add("PRIVATE-TOKEN", *g.AuthToken)
+	resp, err := g.HttpClient.Do(req)
+	g.failOnError(err, "Error getting repoTagUrl")
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	g.failOnError(err, "Error reading all")
+	return &body
+}
 func (g *GitlabRegistry) Run() {
 	g.prepare()
 	if g.SpecificTag != nil {
