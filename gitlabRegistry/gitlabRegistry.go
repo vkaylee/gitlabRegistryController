@@ -1,7 +1,6 @@
 package gitlabRegistry
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -24,7 +23,6 @@ type GitlabRegistry struct {
 	BaseUrl *string
 	RepoTagUrl *string
 	SpecificTag *string
-	Regex *string
 	RegexPattern *regexp.Regexp
 	NumToHold *int
 	HttpClient *http.Client
@@ -58,7 +56,6 @@ func (g *GitlabRegistry) setRegex(v *string) {
 	var err error
 	g.RegexPattern, err = regexp.Compile(*v)
 	g.failOnError(err, "Error when compiling regex string to regex pattern")
-	g.Regex = v
 }
 func (g *GitlabRegistry) setProjectId() {
 	id := fmt.Sprintf("%s%%2F%s",*g.NameSpace,*g.ProjectName)
@@ -71,7 +68,7 @@ func (g *GitlabRegistry) prepare() {
 	g.getRepoId()
 	g.generateRepositoryTagUrl()
 }
-func (g *GitlabRegistry) takeAllTags(regexps *string) *[]string {
+func (g *GitlabRegistry) takeAllTags() *[]string {
 	type tagDetails struct {
 		Name      string    `json:"name"`
 		CreatedAt time.Time `json:"created_at"`
@@ -87,10 +84,9 @@ func (g *GitlabRegistry) takeAllTags(regexps *string) *[]string {
 	g.failOnError(err, "Error encode json")
 	// Define a list to store all tags with date type
 	listTagDetails := make([]tagDetails,0)
-	r, _ := regexp.Compile(*regexps)
 	// Loop all tags to check datetime and store to the slice
 	for _, tag := range tags {
-		if r.MatchString(tag.Name) {
+		if g.RegexPattern.MatchString(tag.Name) {
 			url := fmt.Sprintf("%s/%s",*g.RepoTagUrl, tag.Name)
 			body := g.httpGet(&url)
 			tagDetails := tagDetails{}
@@ -126,7 +122,7 @@ func (g *GitlabRegistry) Run() {
 	if g.SpecificTag != nil {
 		g.deleteSpecificTag(g.SpecificTag)
 	}
-	if g.Regex != nil {
+	if g.RegexPattern != nil {
 		g.deleteWithRegex()
 	}
 }
@@ -156,30 +152,11 @@ func (g *GitlabRegistry) deleteSpecificTag(tag *string) {
 	}
 }
 func (g *GitlabRegistry) deleteWithRegex() {
-	type DeleteWithRegex struct {
-		Regex    string `json:"name_regex"`
-		NumToHold int `json:"keep_n"`
-	}
-	value := DeleteWithRegex{
-		Regex:     *g.Regex,
-		NumToHold: *g.NumToHold,
-	}
-	jsonValue, _ := json.Marshal(value)
-	req, err := http.NewRequest(http.MethodDelete,*g.RepoTagUrl,bytes.NewBuffer(jsonValue))
-	g.failOnError(err, "Error setting http request")
-	req.Header.Add("PRIVATE-TOKEN", *g.AuthToken)
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := g.HttpClient.Do(req)
-	g.failOnError(err, "Error deleting url")
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusAccepted {
-		log.Printf("The request to delete with %s regex has just been done successfully", *g.Regex)
-	} else {
-		log.Printf("The request to delete with %s regex has not been done yet", *g.Regex)
-		body, err := ioutil.ReadAll(resp.Body)
-		g.failOnError(err, "Error reading json body")
-		fmt.Println(string(body))
+	tagNames := g.takeAllTags()
+	for k, tagName := range *tagNames {
+		if k > *g.NumToHold - 1 {
+			g.deleteSpecificTag(&tagName)
+		}
 	}
 }
 func (g *GitlabRegistry) getRepoId() {
