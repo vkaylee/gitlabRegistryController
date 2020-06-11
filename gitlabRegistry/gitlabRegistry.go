@@ -9,6 +9,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"sort"
+	"time"
 )
 
 type GitlabRegistry struct {
@@ -63,6 +66,45 @@ func (g *GitlabRegistry) prepare() {
 	g.generateBaseUrl()
 	g.getRepoId()
 	g.generateRepositoryTagUrl()
+}
+func (g *GitlabRegistry) takeAllTags(regexps *string) *[]string {
+	type tagDetails struct {
+		Name      string    `json:"name"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+	// Call API to take the list of tags name
+	body := g.httpGet(g.RepoTagUrl)
+	// Define list to store all tags
+	tags := make([]struct{
+		Name      string    `json:"name"`
+	},0)
+	// Decode json to tags
+	err := json.Unmarshal(*body, &tags)
+	g.failOnError(err, "Error encode json")
+	// Define a list to store all tags with date type
+	listTagDetails := make([]tagDetails,0)
+	r, _ := regexp.Compile(*regexps)
+	// Loop all tags to check datetime and store to the slice
+	for _, tag := range tags {
+		if r.MatchString(tag.Name) {
+			url := fmt.Sprintf("%s/%s",*g.RepoTagUrl, tag.Name)
+			body := g.httpGet(&url)
+			tagDetails := tagDetails{}
+			err := json.Unmarshal(*body, &tagDetails)
+			g.failOnError(err, "Error encode json")
+			listTagDetails = append(listTagDetails, tagDetails)
+		}
+	}
+	// Sort the slice via datetime
+	sort.Slice(listTagDetails, func(i, j int) bool {
+		return listTagDetails[i].CreatedAt.After(listTagDetails[j].CreatedAt)
+	})
+	// Define output
+	output := make([]string,0)
+	for _, tagDetails := range listTagDetails {
+		output = append(output, tagDetails.Name)
+	}
+	return &output
 }
 func (g *GitlabRegistry) httpGet(url *string) *[]byte {
 	req, err := http.NewRequest(http.MethodGet, *url, nil)
