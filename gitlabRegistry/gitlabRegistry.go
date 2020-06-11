@@ -25,6 +25,7 @@ type GitlabRegistry struct {
 	RepoTagUrl *string
 	SpecificTag *string
 	Regex *string
+	RegexPattern *regexp.Regexp
 	NumToHold *int
 	HttpClient *http.Client
 }
@@ -54,6 +55,9 @@ func (g *GitlabRegistry) setNumToHold(v *int) {
 }
 // setRegex sets the regex field's value.
 func (g *GitlabRegistry) setRegex(v *string) {
+	var err error
+	g.RegexPattern, err = regexp.Compile(*v)
+	g.failOnError(err, "Error when compiling regex string to regex pattern")
 	g.Regex = v
 }
 func (g *GitlabRegistry) setProjectId() {
