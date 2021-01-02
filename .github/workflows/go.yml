@@ -68,4 +68,4 @@ jobs:
           docker push registry.gitlab.com/vleedev/gitlab-registry-controller:3alpine-latest
           docker push registry.gitlab.com/vleedev/gitlab-registry-controller:4alpine-latest
       - name: Delete images with regex
-        run: go run main.go -domain https://gitlab.com/api/v4 -authToken "${{ secrets.GITLAB_PASS }}" -nameSpace vleedev -projectName gitlab-registry-controller -specificTag -regex=".*-latest" -hold=1
+        run: go run main.go -domain https://gitlab.com/api/v4 -authToken "${{ secrets.GITLAB_PASS }}" -nameSpace vleedev -projectName gitlab-registry-controller -regex=".*-latest" -hold=1
