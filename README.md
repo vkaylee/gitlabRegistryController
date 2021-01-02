@@ -1,3 +1,4 @@
+![Go](https://github.com/vleedev/gitlabRegistryController/workflows/Go/badge.svg)
 # gitlabRegistryController
 This tool is used to delete images in gitlab registry
 ## Install
