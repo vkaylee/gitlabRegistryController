@@ -54,3 +54,18 @@ jobs:
         uses: actions/checkout@v2
       - name: Delete specific image
         run: go run main.go -domain https://gitlab.com/api/v4 -authToken "${{ secrets.GITLAB_PASS }}" -nameSpace vleedev -projectName gitlab-registry-controller -specificTag alpine-latest
+
+      - name: Tag example images
+        run: |
+          docker tag alpine:latest registry.gitlab.com/vleedev/gitlab-registry-controller:1alpine-latest
+          docker tag alpine:latest registry.gitlab.com/vleedev/gitlab-registry-controller:2alpine-latest
+          docker tag alpine:latest registry.gitlab.com/vleedev/gitlab-registry-controller:3alpine-latest
+          docker tag alpine:latest registry.gitlab.com/vleedev/gitlab-registry-controller:4alpine-latest
+      - name: Push example images
+        run: |
+          docker push registry.gitlab.com/vleedev/gitlab-registry-controller:1alpine-latest
+          docker push registry.gitlab.com/vleedev/gitlab-registry-controller:2alpine-latest
+          docker push registry.gitlab.com/vleedev/gitlab-registry-controller:3alpine-latest
+          docker push registry.gitlab.com/vleedev/gitlab-registry-controller:4alpine-latest
+      - name: Delete images with regex
+        run: go run main.go -domain https://gitlab.com/api/v4 -authToken "${{ secrets.GITLAB_PASS }}" -nameSpace vleedev -projectName gitlab-registry-controller -specificTag -regex=".*-latest" -hold=1
