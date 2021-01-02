@@ -37,7 +37,7 @@ jobs:
       - build
     steps:
       - name: Docker login
-        run: echo "${{ secrets.GITLAB_PASS }}" | docker login registry.gitlab.com -u "${GITLAB_USER}" --password-stdin
+        run: echo "${{ secrets.GITLAB_PASS }}" | docker login registry.gitlab.com -u "${{ secrets.GITLAB_USER }}" --password-stdin
       - name: Pull example image
         run: docker pull alpine:latest
       - name: Tag example image
