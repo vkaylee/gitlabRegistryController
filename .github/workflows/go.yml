@@ -16,7 +16,7 @@ jobs:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.14
+        go-version: ^1.15
       id: go
 
     - name: Check out code into the Go module directory
@@ -44,3 +44,13 @@ jobs:
         run: docker tag alpine:latest registry.gitlab.com/vleedev/gitlab-registry-controller:alpine-latest
       - name: Push example image
         run: docker push registry.gitlab.com/vleedev/gitlab-registry-controller:alpine-latest
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.15
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Delete specific image
+        run: go run main.go -domain https://gitlab.example.com/api/v4 -authToken "${{ secrets.GITLAB_PASS }}" -nameSpace vleedev -projectName gitlab-registry-controller -specificTag alpine-latest
